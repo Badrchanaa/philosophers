@@ -6,7 +6,7 @@
 /*   By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 21:25:53 by bchanaa           #+#    #+#             */
-/*   Updated: 2024/05/07 21:26:40 by bchanaa          ###   ########.fr       */
+/*   Updated: 2024/05/11 14:19:39 by bchanaa          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,4 +55,16 @@ int	right_philo(int philo_id, int philo_count)
 	if (philo_id == philo_count - 1)
 		return (0);
 	return (philo_id + 1);
+}
+
+int	philo_starved(t_philo *philo)
+{
+	unsigned int	diff;
+	struct timeval	tv;
+
+	if (philo->ctx->max_meals == philo->meal_count)
+		return (0);
+	gettimeofday(&tv, NULL);
+	diff = time_diff(&philo->last_meal_tv, &tv);
+	return (diff >= (unsigned int)philo->ctx->tt_die);
 }
