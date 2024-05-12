@@ -6,7 +6,7 @@
 /*   By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 21:19:49 by bchanaa           #+#    #+#             */
-/*   Updated: 2024/05/10 20:15:22 by bchanaa          ###   ########.fr       */
+/*   Updated: 2024/05/12 18:18:24 by bchanaa          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ int	init_context(int ac, char **av, t_context *ctx)
 	ctx->tt_die = ft_atoi(av[2]);
 	ctx->tt_eat = ft_atoi(av[3]);
 	ctx->tt_sleep =	ft_atoi(av[4]);
+	ctx->all_alive = 1;
 	if (ac == 6)
 		ctx->max_meals = ft_atoi(av[5]);
 	else

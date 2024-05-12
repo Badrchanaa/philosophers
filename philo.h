@@ -6,7 +6,7 @@
 /*   By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 21:26:49 by bchanaa           #+#    #+#             */
-/*   Updated: 2024/05/11 16:38:21 by bchanaa          ###   ########.fr       */
+/*   Updated: 2024/05/12 18:18:14 by bchanaa          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ typedef struct	s_context
 	int				tt_eat;
 	int				tt_die;
 	int				max_meals;
+	int				all_alive;
 }				t_context;
 
 typedef struct	s_philo

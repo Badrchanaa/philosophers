@@ -6,32 +6,32 @@
 /*   By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 19:11:01 by bchanaa           #+#    #+#             */
-/*   Updated: 2024/05/11 17:12:42 by bchanaa          ###   ########.fr       */
+/*   Updated: 2024/05/12 19:19:38 by bchanaa          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-
-int add_one(int *num)
-{
-	int				tmp;
-	int				i;
-	unsigned char	c;
-	unsigned char	*tmp_p;
-
-	tmp = *num;
-	tmp++;
-	tmp_p = (unsigned char *)&tmp;
-	i = 0;
-	while (i < 4)
-	{
-		c = tmp_p[i];
-		memset(((unsigned char *)num) + i, c, sizeof(char));
-		i++;
-	}
-	return (tmp);
-}
+// 
+// int add_one(int *num)
+// {
+// 	int				tmp;
+// 	int				i;
+// 	unsigned char	c;
+// 	unsigned char	*tmp_p;
+// 
+// 	tmp = *num;
+// 	tmp++;
+// 	tmp_p = (unsigned char *)&tmp;
+// 	i = 0;
+// 	while (i < 4)
+// 	{
+// 		c = tmp_p[i];
+// 		memset(((unsigned char *)num) + i, c, sizeof(char));
+// 		i++;
+// 	}
+// 	return (tmp);
+// } 
 
 int	philo_eat(t_philo *philo)
 {
@@ -50,8 +50,8 @@ int	philo_eat(t_philo *philo)
 	printf("%u philo N%d took right fork\n", get_timestamp(&philo->ctx->tv), philo->id + 1);
 	printf("%u philo N%d is eating.\n", get_timestamp(&philo->ctx->tv), philo->id + 1);
 	precise_sleep(philo->ctx->tt_eat);
-	gettimeofday(&philo->last_meal_tv, NULL);
-	add_one(&philo->meal_count);
+	if (gettimeofday(&philo->last_meal_tv, NULL))
+			printf("------ GETTIME FAILED -----\n");
 	pthread_mutex_unlock(philo->ctx->mutexes + left_id);
 	pthread_mutex_unlock(philo->ctx->mutexes + right_id);
 	return (0);
@@ -73,15 +73,20 @@ void	*philosopher(void *p_philo)
 	
 	philo = p_philo;
 	max_meals = philo->ctx->max_meals;
-	while (!philo->is_dead && (max_meals == -1 || (philo->meal_count < max_meals)))
+	while (philo->ctx->all_alive && !philo->is_dead && (max_meals == -1 || (philo->meal_count < max_meals)))
 	{
 		if (philo_eat(philo))
-			return (philo->ctx);
+			break ;
+		philo->meal_count++;
+		if (philo->ctx->max_meals > 0 && philo->meal_count >= philo->ctx->max_meals)
+		{
+			memset(&philo->is_dead, 255, sizeof(int));
+			break;
+		}
 		if (philo_sleep(philo))
-			return (philo->ctx);
-		printf("%u philo N%d is thinking.\n", get_timestamp(&philo->ctx->tv), philo->id);
+			break ;
 	}
-
+	printf("---------- N%d is dead: %d | meals: %d -------------\n", philo->id + 1, philo->is_dead, philo->meal_count);
 	return (philo->ctx);
 }
 
@@ -122,10 +127,10 @@ int	main(int ac, char *av[])
 	t_context	*ctx;
 	t_philo		*philos;
 
+	if (ac < 5 || ac > 6)
+		return (1);
 	ctx = malloc(sizeof(t_context));
 	if (!ctx)
-		return (1);
-	if (ac < 5 || ac > 6)
 		return (1);
 	if (!init_context(ac, av, ctx))
 		return (1);
@@ -142,8 +147,7 @@ int	main(int ac, char *av[])
 		return (printf("init mutex failed\n"), 1);
 	philos = start_simulation(ctx);
 	int i;
-	int	all_alive = 1;
-	while (all_alive)
+	while (ctx->all_alive)
 	{
 		i = 0;
 		while (i < ctx->philo_count)
@@ -152,9 +156,8 @@ int	main(int ac, char *av[])
 			if (!philo->is_dead && philo_starved(philo))
 			{
 				printf("%u philo N%d is dead.\n", get_timestamp(&ctx->tv), i + 1);
-				//philo->is_dead = PHILO_DEAD;
 				memset(&philo->is_dead, 255, sizeof(int));
-				all_alive = 0;
+				memset(&ctx->all_alive, 0, sizeof(int));
 				break;
 			}
 			i++;
@@ -163,5 +166,6 @@ int	main(int ac, char *av[])
 	destroy_mutexes(ctx->mutexes, ctx->philo_count);
 	free(ctx->forks);
 	free(ctx);
+	printf("Out of main\n");
 	return (0);
 }
