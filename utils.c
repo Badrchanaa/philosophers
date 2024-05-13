@@ -6,7 +6,7 @@
 /*   By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 21:25:53 by bchanaa           #+#    #+#             */
-/*   Updated: 2024/05/12 18:42:50 by bchanaa          ###   ########.fr       */
+/*   Updated: 2024/05/13 21:47:10 by bchanaa          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,13 +43,6 @@ int	ft_atoi(const char *str)
 	return (res * sign);
 }
 
-int	left_philo(int philo_id, int philo_count)
-{
-	if (philo_id == 0)
-		return (philo_count - 1);
-	return (philo_id - 1);
-}
-
 int	right_philo(int philo_id, int philo_count)
 {
 	if (philo_id == philo_count - 1)
@@ -59,10 +52,14 @@ int	right_philo(int philo_id, int philo_count)
 
 int	philo_starved(t_philo *philo)
 {
-	unsigned int	diff;
-	struct timeval	tv;
+	size_t	current_time;
+	size_t	last_meal;
+	size_t	diff;
 
-	gettimeofday(&tv, NULL);
-	diff = time_diff(&philo->last_meal_tv, &tv);
-	return (diff >= (unsigned int)philo->ctx->tt_die);
+	pthread_mutex_lock(&philo->time_lock);
+	last_meal = philo->last_meal;
+	pthread_mutex_unlock(&philo->time_lock);
+	current_time = get_current_time();
+	diff = current_time - last_meal;
+	return (diff > INT_MAX || (int)diff >= philo->ctx->tt_die);
 }

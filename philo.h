@@ -6,7 +6,7 @@
 /*   By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 21:26:49 by bchanaa           #+#    #+#             */
-/*   Updated: 2024/05/12 18:18:14 by bchanaa          ###   ########.fr       */
+/*   Updated: 2024/05/13 21:47:30 by bchanaa          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <sys/time.h>
 # include <stdlib.h>
 # include <string.h>
+# include <limits.h>
 
 # define ST_EAT
 # define ST_THINK
@@ -27,8 +28,7 @@
 typedef struct	s_context
 {
 	struct timeval	tv;
-	int				*forks;
-	pthread_mutex_t	*mutexes;
+	pthread_mutex_t	*forks;
 	int				philo_count;
 	int				tt_sleep;
 	int				tt_eat;
@@ -39,23 +39,28 @@ typedef struct	s_context
 
 typedef struct	s_philo
 {
-	t_context	*ctx;
-	pthread_t	thread;
-	struct timeval	last_meal_tv;
-	int			id;
-	int			is_dead;
-	int			meal_count;
+	t_context		*ctx;
+	pthread_t		thread;
+	size_t			last_meal;
+	pthread_mutex_t	time_lock;
+	int				id;
+	int				is_dead;
+	int				meal_count;
+	pthread_mutex_t	count_lock;
 }			t_philo;
 
+void	*philosopher(void *p_philo);
 int		ft_atoi(const char *str);
 int		left_philo(int philo_id, int philo_count);
 int		right_philo(int philo_id, int philo_count);
 int		init_context(int ac, char **av, t_context *ctx);
+int		init_philos(t_context *ctx, t_philo *philos);
 void	precise_sleep(unsigned int ms);
-int		init_mutexes(pthread_mutex_t *mutexes, int size);
-void	destroy_mutexes(pthread_mutex_t *mutexes, int size);
-int	philo_starved(t_philo *philo);
-unsigned int	time_diff(struct timeval *tv1, struct timeval *tv2);
-unsigned int	get_timestamp(struct timeval *start_tv);
+void	destroy_forks(pthread_mutex_t *forks, int size);
+int		init_forks(pthread_mutex_t *forks, int size);
+int		philo_starved(t_philo *philo);
+size_t	time_diff(struct timeval *tv1, struct timeval *tv2);
+size_t	get_timestamp(struct timeval *start_tv);
+size_t	get_current_time(void);
 
 #endif

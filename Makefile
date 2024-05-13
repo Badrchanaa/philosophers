@@ -6,7 +6,7 @@
 #    By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/07 21:42:10 by bchanaa           #+#    #+#              #
-#    Updated: 2024/05/11 17:07:30 by bchanaa          ###   ########.fr        #
+#    Updated: 2024/05/13 21:48:21 by bchanaa          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror -fsanitize=thread -g3
 
 HEADERS = philo.h
-SOURCES = main.c init.c utils.c time_utils.c
+SOURCES = main.c init.c utils.c time_utils.c routines.c
 OBJS := $(SOURCES:.c=.o)
 OBJECTS = $(addprefix $(OBJECTS_DIR)/, $(OBJS))
 OBJECTS_DIR = bin
