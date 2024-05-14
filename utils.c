@@ -6,7 +6,7 @@
 /*   By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 21:25:53 by bchanaa           #+#    #+#             */
-/*   Updated: 2024/05/13 21:47:10 by bchanaa          ###   ########.fr       */
+/*   Updated: 2024/05/14 17:48:39 by bchanaa          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,16 +50,16 @@ int	right_philo(int philo_id, int philo_count)
 	return (philo_id + 1);
 }
 
-int	philo_starved(t_philo *philo)
+inline int	philo_starved(t_philo *philo)
 {
 	size_t	current_time;
 	size_t	last_meal;
 	size_t	diff;
 
+	current_time = get_current_time();
 	pthread_mutex_lock(&philo->time_lock);
 	last_meal = philo->last_meal;
 	pthread_mutex_unlock(&philo->time_lock);
-	current_time = get_current_time();
 	diff = current_time - last_meal;
 	return (diff > INT_MAX || (int)diff >= philo->ctx->tt_die);
 }

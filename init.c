@@ -6,7 +6,7 @@
 /*   By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 21:19:49 by bchanaa           #+#    #+#             */
-/*   Updated: 2024/05/13 21:44:02 by bchanaa          ###   ########.fr       */
+/*   Updated: 2024/05/14 19:27:05 by bchanaa          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int	init_context(int ac, char **av, t_context *ctx)
 	ctx->tt_die = ft_atoi(av[2]);
 	ctx->tt_eat = ft_atoi(av[3]);
 	ctx->tt_sleep =	ft_atoi(av[4]);
-	ctx->all_alive = 1;
+	ctx->kill_all = 0;
 	if (ac == 6)
 		ctx->max_meals = ft_atoi(av[5]);
 	else
@@ -57,8 +57,7 @@ int	new_philo(t_context *ctx, t_philo *philo_arr, int id)
 	philo->ctx = ctx;
 	philo->meal_count = 0;
 	philo->last_meal = get_current_time();
-	if (pthread_create(&philo->thread, NULL, philosopher, philo)
-		|| pthread_detach(philo->thread))
+	if (pthread_create(&philo->thread, NULL, philosopher, philo))
 		return (destroy_philo(philo), 1);
 	return (0);
 }
@@ -70,6 +69,8 @@ int	init_philos(t_context *ctx, t_philo *philos)
 	i = 0;
 	while (i < ctx->philo_count)
 	{
+		if (i % 2 == 0)
+			usleep(500);
 		if (new_philo(ctx, philos, i))
 			break;
 		i++;
@@ -106,6 +107,20 @@ void	destroy_forks(pthread_mutex_t *forks, int size)
 	while (i < size)
 	{
 		pthread_mutex_destroy(forks + i);
+		i++;
+	}
+}
+
+void	destroy_philosophers(t_philo *philos, int size)
+{
+	t_philo	*philo;
+	int		i;
+
+	i = 0;
+	while (i < size)
+	{
+		philo = philos + i;
+		destroy_philo(philo);
 		i++;
 	}
 }

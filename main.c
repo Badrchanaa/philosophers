@@ -6,7 +6,7 @@
 /*   By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 19:11:01 by bchanaa           #+#    #+#             */
-/*   Updated: 2024/05/13 21:34:54 by bchanaa          ###   ########.fr       */
+/*   Updated: 2024/05/14 18:50:30 by bchanaa          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,27 @@ t_philo	*start_simulation(t_context *ctx)
 	return (philos);
 }
 
+int	join_all(t_philo *philos, int size)
+{
+	int		i;
+	t_philo	*philo;
+
+	i = 0;
+	while (i < size)
+	{
+		philo = philos + i;
+		pthread_join(philo->thread, NULL);
+		i++;
+	}
+	return (0);
+}
+
 void	monitor(t_context *ctx, t_philo *philos)
 {
 	t_philo	*philo;
 	int 	i;
 
-	while (ctx->all_alive)
+	while (!ctx->kill_all)
 	{
 		i = 0;
 		while (i < ctx->philo_count)
@@ -43,34 +58,34 @@ void	monitor(t_context *ctx, t_philo *philos)
 			{
 				printf("%zu philo N%d is dead.\n", get_timestamp(&ctx->tv), i + 1);
 				memset(&philo->is_dead, 255, sizeof(int));
-				memset(&ctx->all_alive, 0, sizeof(int));
+				memset(&ctx->kill_all, 255, sizeof(int));
 				break;
 			}
 			i++;
 		}
+		usleep(1000);
 	}
 }
 
 int	main(int ac, char *av[])
 {
-	t_context	*ctx;
+	t_context	ctx;
 	t_philo		*philos;
 
 	if (ac < 5 || ac > 6)
 		return (1);
-	ctx = malloc(sizeof(t_context));
-	if (!ctx)
+	if (!init_context(ac, av, &ctx))
 		return (1);
-	if (!init_context(ac, av, ctx))
+	if (!init_forks(ctx.forks, ctx.philo_count))
 		return (1);
-	if (!init_forks(ctx->forks, ctx->philo_count))
-		return (1);
-	philos = start_simulation(ctx);
+	philos = start_simulation(&ctx);
 	if (!philos)
 		return (1);
-	monitor(ctx, philos);
-	destroy_forks(ctx->forks, ctx->philo_count);
-	free(ctx);
+	monitor(&ctx, philos);
+	join_all(philos, ctx.philo_count);
 	printf("Out of main\n");
+	destroy_forks(ctx.forks, ctx.philo_count);
+	destroy_philosophers(philos, ctx.philo_count);
+	free(philos);
 	return (0);
 }
