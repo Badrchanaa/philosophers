@@ -6,7 +6,7 @@
 /*   By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 21:19:49 by bchanaa           #+#    #+#             */
-/*   Updated: 2024/05/14 19:27:05 by bchanaa          ###   ########.fr       */
+/*   Updated: 2024/05/15 19:40:16 by bchanaa          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ int	init_context(int ac, char **av, t_context *ctx)
 		return (0);
 	ctx->forks = malloc(sizeof(pthread_mutex_t) * (ctx->philo_count));
 	if (!ctx->forks)
+		return (0);
+	if (pthread_mutex_init(&ctx->kill_lock, NULL))
 		return (free(ctx->forks), 0);
 	return (1);
 }

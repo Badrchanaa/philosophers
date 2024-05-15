@@ -6,12 +6,11 @@
 /*   By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 19:11:01 by bchanaa           #+#    #+#             */
-/*   Updated: 2024/05/14 18:50:30 by bchanaa          ###   ########.fr       */
+/*   Updated: 2024/05/15 22:27:31 by bchanaa          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
 
 t_philo	*start_simulation(t_context *ctx)
 {
@@ -47,18 +46,22 @@ void	monitor(t_context *ctx, t_philo *philos)
 {
 	t_philo	*philo;
 	int 	i;
+	int		dead_count;
 
-	while (!ctx->kill_all)
+	dead_count = 0;
+	while (!ctx->kill_all && dead_count < ctx->philo_count)
 	{
 		i = 0;
+		dead_count = 0;
 		while (i < ctx->philo_count)
 		{
 			philo = philos + i;
-			if (!philo->is_dead && philo_starved(philo))
+			if (is_dead(philo))
+				dead_count++;
+			else if (philo_starved(philo))
 			{
 				printf("%zu philo N%d is dead.\n", get_timestamp(&ctx->tv), i + 1);
-				memset(&philo->is_dead, 255, sizeof(int));
-				memset(&ctx->kill_all, 255, sizeof(int));
+				apocalypse(ctx, philo);
 				break;
 			}
 			i++;
@@ -87,5 +90,6 @@ int	main(int ac, char *av[])
 	destroy_forks(ctx.forks, ctx.philo_count);
 	destroy_philosophers(philos, ctx.philo_count);
 	free(philos);
+	free(ctx.forks);
 	return (0);
 }

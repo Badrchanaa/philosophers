@@ -6,7 +6,7 @@
 /*   By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 21:26:49 by bchanaa           #+#    #+#             */
-/*   Updated: 2024/05/14 16:42:12 by bchanaa          ###   ########.fr       */
+/*   Updated: 2024/05/15 18:36:25 by bchanaa          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@
 typedef struct	s_context
 {
 	struct timeval	tv;
+	pthread_mutex_t	kill_lock;
 	pthread_mutex_t	*forks;
 	int				philo_count;
 	int				tt_sleep;
@@ -41,12 +42,12 @@ typedef struct	s_philo
 {
 	t_context		*ctx;
 	pthread_t		thread;
-	size_t			last_meal;
 	pthread_mutex_t	time_lock;
+	pthread_mutex_t	count_lock;
+	size_t			last_meal;
 	int				id;
 	int				is_dead;
 	int				meal_count;
-	pthread_mutex_t	count_lock;
 }			t_philo;
 
 void	*philosopher(void *p_philo);
@@ -63,5 +64,8 @@ int		philo_starved(t_philo *philo);
 size_t	time_diff(struct timeval *tv1, struct timeval *tv2);
 size_t	get_timestamp(struct timeval *start_tv);
 size_t	get_current_time(void);
+
+void	apocalypse(t_context *ctx, t_philo *philo);
+int	is_dead(t_philo *philo);
 
 #endif

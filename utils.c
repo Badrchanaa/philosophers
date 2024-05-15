@@ -6,10 +6,9 @@
 /*   By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 21:25:53 by bchanaa           #+#    #+#             */
-/*   Updated: 2024/05/14 17:48:39 by bchanaa          ###   ########.fr       */
+/*   Updated: 2024/05/15 18:35:53 by bchanaa          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "philo.h"
 
 static int	ft_isspace(char c)
@@ -62,4 +61,24 @@ inline int	philo_starved(t_philo *philo)
 	pthread_mutex_unlock(&philo->time_lock);
 	diff = current_time - last_meal;
 	return (diff > INT_MAX || (int)diff >= philo->ctx->tt_die);
+}
+
+int	is_dead(t_philo *philo)
+{
+	int	count;
+
+	pthread_mutex_lock(&philo->count_lock);
+	count = philo->meal_count;	
+	pthread_mutex_unlock(&philo->count_lock);
+	return (count < 0);
+}
+
+void	apocalypse(t_context *ctx, t_philo *philo)
+{
+	pthread_mutex_lock(&philo->count_lock);
+	philo->meal_count *= -1;
+	pthread_mutex_unlock(&philo->count_lock);
+	pthread_mutex_lock(&ctx->kill_lock);
+	ctx->kill_all = 1;
+	pthread_mutex_unlock(&ctx->kill_lock);
 }
