@@ -125,7 +125,7 @@ void	*philosopher(void *p_philo)
 	max_meals = philo->ctx->max_meals;
 	while (still_alive(philo) && !is_full(philo))
 	{
-		if (philo->id + 1 % 2 != 0)
+		if ((philo->id + 1) % 2 != 0)
 			usleep(500);
 		if (philo_eat(philo))
 			break ;

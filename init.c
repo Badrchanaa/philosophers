@@ -6,7 +6,7 @@
 /*   By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 21:19:49 by bchanaa           #+#    #+#             */
-/*   Updated: 2024/05/15 19:40:16 by bchanaa          ###   ########.fr       */
+/*   Updated: 2024/05/16 16:34:51 by bchanaa          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,8 +71,6 @@ int	init_philos(t_context *ctx, t_philo *philos)
 	i = 0;
 	while (i < ctx->philo_count)
 	{
-		if (i % 2 == 0)
-			usleep(500);
 		if (new_philo(ctx, philos, i))
 			break;
 		i++;
