@@ -6,7 +6,7 @@
 /*   By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 21:26:49 by bchanaa           #+#    #+#             */
-/*   Updated: 2024/05/15 18:36:25 by bchanaa          ###   ########.fr       */
+/*   Updated: 2024/05/18 15:51:48 by bchanaa          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,6 @@
 # include <stdlib.h>
 # include <string.h>
 # include <limits.h>
-
-# define ST_EAT
-# define ST_THINK
-# define ST_SLEEP
 
 typedef struct	s_context
 {
