@@ -76,7 +76,7 @@ int	fork_philosophers(t_context *ctx)
 	while (i < ctx->philo_count)
 	{
 		pid = fork();
-		if (pid < 0)
+		if (pid < 0) // Kill ALL ??
 			break;
 		if (pid == 0)
 		{
@@ -116,6 +116,13 @@ int	kill_all(pid_t *pids, int size)
 	}
 	return (0);
 }
+// Solution 1
+// Each child process monitors its philosopher, and posts sem_kill if it dies
+// Main process waits for sem_kill then kills all philosophers
+
+// Solution 2 (best)
+// Each child process monitors its philosopher, and kills itself when its philosopher dies
+// Main process waits for any child process to terminate, then kills all the other ones
 
 int	main(int ac, char **av)
 {
@@ -125,13 +132,12 @@ int	main(int ac, char **av)
 		return (1);
 	if (!init_context(ac, av, &ctx))
 		return (1);
-	if (!fork_philosophers())
-	{
-		wait_all(&ctx);
-		return (1);
-	}
-	sem_wait();
-	kill_all(ctx.pids, ctx.philo_count);
+	// Wait for a philosopher to die
+	sem_wait(ctx.sem_kill);
+	fork_philosophers();
+	if (wait(NULL)) // Someone died
+		kill_all(ctx.pids, ctx.philo_count);
+	//kill_all(ctx.pids, ctx.philo_count);
 	wait_all(&ctx);
 	return (0);
 }
