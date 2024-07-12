@@ -106,14 +106,15 @@ void	wait_all(t_context *ctx)
 
 int	kill_all(pid_t *pids, int size)
 {
-	int	i;
+	// int	i;
 
-	i = 0;
-	while (i < size)
-	{
-		kill(pids[i], SIGKILL);
-		i++:
-	}
+	// i = 0;
+	// while (i < size)
+	// {
+	// 	kill(pids[i], SIGKILL);
+	// 	i++:
+	// }
+	kill(0, SIGKILL);
 	return (0);
 }
 // Solution 1
