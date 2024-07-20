@@ -16,7 +16,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-int main(void)
+int new_child(void)
 {
     pid_t   pid;
 
@@ -25,20 +25,25 @@ int main(void)
         return (1);
     else if (pid == 0)
     {
-        sleep(5);
-        exit(127);
+        sleep(20);
+        exit(1);
     }
-    else
+    return (pid);
+}
+
+int main(void)
+{
+    pid_t pids[5];
+    int status;
+
+    pids[0] = new_child();
+    printf("all spawned\n");
+    sleep(4);
+    while (1)
     {
-        int stillAlive = 1;
-        int status = 0;
-        while (stillAlive)
-        {
-            sleep(1);
-            if (waitpid(pid, &status, WNOHANG) > 0) // TERMINATED;
-              stillAlive = 0; 
-            printf("status: %d still alive: %d\n", status, stillAlive);
-        }
+        int ret = waitpid(0, &status, WNOHANG);
+        printf("ret is %d\n", ret);
+        sleep(1);
     }
     return (0);
 }

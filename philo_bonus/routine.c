@@ -16,18 +16,34 @@ int	is_dead(t_philo *philo, t_context *ctx)
 {
 	int	state;
 	sem_wait(philo->sem_state);
-	state = philo->sem_state;
+	state = philo->state;
 	sem_post(philo->sem_state);
 	return (state == PHIL_DEAD || state == PHIL_FULL);
+}
+
+void	get_philo_state(t_philo *philo, t_context *ctx, t_state *state)
+{
+	sem_wait(philo->sem_state);
+	state->meal_cout = philo->meal_count;
+	state->state = philo->state;
+	state->last_meal = philo->last_meal;
+	sem_post(philo->sem_state);
 }
 
 int	take_fork(t_philo *philo, t_context *ctx)
 {
 	if (is_dead(philo, ctx))
 		return (0);
+	sem_wait(ctx->sem_waiter);
+	if (is_dead(philo, ctx))
+		return (0);
 	sem_wait(ctx->sem_forks);
 	if (is_dead(philo, ctx))
 		return (0);
+	sem_wait(ctx->sem_forks);
+	if (is_dead(philo, ctx))
+		return (0);
+	sem_post(ctx->sem_waiter);
 	sem_wait(ctx->sem_print);
 	if (is_dead(philo, ctx))
 		return (0);
@@ -45,6 +61,12 @@ int	p_eat(t_philo *philo, t_context *ctx)
 	precise_sleep(ctx->tt_eat);
 	if (is_dead(philo, ctx))
 		return (0);
+	sem_wait(ctx->sem_state);
+	philo->meal_count++;
+	if (philo->meal_count == ctx->max_meals)
+		philo->state = PHIL_FULL;
+	philo->last_meal = get_current_time();
+	sem_post(ctx->sem_state);
 	sem_post(ctx->sem_forks);
 	sem_post(ctx->sem_forks);
 	return (1);

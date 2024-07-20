@@ -28,6 +28,7 @@
 # define SEM_FORKS "/philo_forks"
 # define SEM_PRINT "/philo_print"
 # define SEM_STATE "/philo_state"
+# define SEM_WAITER "/philo_waiter"
 # define SEM_PERMS 0600
 
 # define PHIL_ALIVE
@@ -39,7 +40,8 @@ typedef struct	s_context
 	struct timeval	tv;
 	sem_t			*sem_forks;
 	sem_t			*sem_print;
-	//sem_t			*sem_kill;
+	sem_t			*sem_waiter;
+	sem_t			*sem_state;
 	pid_t			pids[200];
 	int				philo_count;
 	int				tt_sleep;
@@ -53,9 +55,17 @@ typedef struct	s_philo
 	pthread_t	thread;
 	sem_t		*sem_state;
 	int			id;
+	int			state;
 	int			meal_count;
 	size_t		last_meal;
 }				t_philo;
+
+typedef struct s_state
+{
+	int	meal_count;
+	int	last_meal;
+	int	state;
+}		t_state;
 
 size_t	time_diff(struct timeval *tv1, struct timeval *tv2);
 size_t	get_current_time(void);
