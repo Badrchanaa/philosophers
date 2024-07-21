@@ -10,12 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo_bonus.h"
-
 #ifndef PHILO_BONUS_H
 # define PHILO_BONUS_H
 
 # include <semaphore.h>
+# include <sys/wait.h>
 # include <stdio.h>
 # include <fcntl.h>
 # include <pthread.h>
@@ -31,9 +30,9 @@
 # define SEM_WAITER "/philo_waiter"
 # define SEM_PERMS 0600
 
-# define PHIL_ALIVE
-# define PHIL_DEAD
-# define PHIL_FULL
+# define PHIL_ALIVE 0
+# define PHIL_DEAD 1
+# define PHIL_FULL 2
 
 typedef struct	s_context
 {
@@ -52,8 +51,8 @@ typedef struct	s_context
 
 typedef struct	s_philo
 {
+	t_context	*ctx;
 	pthread_t	thread;
-	sem_t		*sem_state;
 	int			id;
 	int			state;
 	int			meal_count;
@@ -63,12 +62,21 @@ typedef struct	s_philo
 typedef struct s_state
 {
 	int	meal_count;
-	int	last_meal;
+	size_t	last_meal;
 	int	state;
 }		t_state;
 
 size_t	time_diff(struct timeval *tv1, struct timeval *tv2);
 size_t	get_current_time(void);
 void	precise_sleep(unsigned int ms);
+int	ft_atoi(const char *str);
+size_t	get_timestamp(struct timeval *start_tv);
 
+
+int	is_dead(t_philo *philo, t_context *ctx);
+void	get_philo_state(t_philo *philo, t_state *state);
+int	take_fork(t_philo *philo, t_context *ctx);
+int	p_eat(t_philo *philo, t_context *ctx);
+int	p_sleep(t_philo *philo, t_context *ctx);
+void	repeat_routine(t_philo *philo, t_context *ctx);
 #endif

@@ -68,43 +68,56 @@ void	close_semaphores(t_context *ctx)
 	sem_close(ctx->sem_waiter);
 }
 
-int	child_main(t_context *ctx, int id)
+void	*philosopher(void *p_philo)
 {
-	t_philo	philo;
-	int		status;
+	t_philo	*philo;
 
-	philo->meal_count = 0;
-	philo->id = id;
-	philo->last_meal = get_current_time();
-	pthread_create(&philo->thread, NULL, philosopher, &philo);
-	status = monitor(ctx, &philo);
-	pthread_join(&philo->thread, NULL);
-	close_semaphores(ctx);
-	return (status);
+	philo = p_philo;	
+	repeat_routine(philo, philo->ctx);
+	return (NULL);
 }
 
-void	monitor(t_context *ctx, t_philo *philo)
+int	monitor(t_context *ctx, t_philo *philo)
 {
 	t_state	state;
 
 	while (1)
 	{
-		sem_wait(sem_state);
-		get_philo_state(philo, ctx, &state);
-		if (state->meal_count >= ctx->max_meals)
-			return (0);
-		if (get_current_time() - state->last_meal > tt_die)
+		sem_wait(ctx->sem_state);
+		get_philo_state(philo, &state);
+		if (ctx->max_meals > 0 && state.meal_count >= ctx->max_meals)
+			return (sem_post(ctx->sem_state), 0);
+		if (get_current_time() - state.last_meal > (size_t) ctx->tt_die)
 		{
-			sem_wait(sem_print);
+			sem_wait(ctx->sem_print);
 			printf("%zu philo N%d is dead.\n", get_timestamp(&ctx->tv), philo->id);
-			sem_post(sem_print);
+			sem_post(ctx->sem_print);
 			philo->state = PHIL_DEAD;
-			sem_post(sem_state);
+			sem_post(ctx->sem_state);
 			return (1);
 		}
-		sem_post(sem_state);
-		precise_sleep(500);
+		sem_post(ctx->sem_state);
+		usleep(500);
 	}
+	return (0);
+}
+
+int	child_main(t_context *ctx, int id)
+{
+	t_philo	philo;
+	int		status;
+
+	philo.meal_count = 0;
+	philo.id = id;
+	philo.last_meal = get_current_time();
+	philo.ctx = ctx;
+	philo.state = PHIL_ALIVE;
+	pthread_create(&philo.thread, NULL, philosopher, &philo);
+	status = monitor(ctx, &philo);
+	pthread_join(philo.thread, NULL);
+	close_semaphores(ctx);
+	//printf("exit child\n");
+	return (status);
 }
 
 int	fork_philosophers(t_context *ctx)
@@ -133,7 +146,7 @@ int	fork_philosophers(t_context *ctx)
 	return (1);
 }
 
-void	wait_all(t_context *ctx)
+void	wait_all()
 {
 	while (waitpid(0, NULL, 0) >= 0)
 		continue ;
@@ -148,7 +161,7 @@ int	kill_all(pid_t *pids, int size)
 	{
 		if (waitpid(pids[i], NULL, WNOHANG) >= 0) // Check if child process is still running
 			kill(pids[i], SIGKILL);
-		i++:
+		i++;
 	}
 	return (0);
 }
@@ -163,17 +176,21 @@ int	kill_all(pid_t *pids, int size)
 int	wait_for_death(t_context *ctx)
 {
 	int	status;
+	int	full_count;
 
-	while (1)
+	full_count = 0;
+	while (full_count < ctx->philo_count)
 	{
 		if (waitpid(0, &status, WNOHANG) > 0)
 		{	
-			if (WIFSIGNALED(status) || (WIFEXITED(status) && WEXITSTATUS(status) != 0))
-				break ;
+			if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
+				full_count++;
+			else
+				return (1);
 		}
 		usleep(500);
 	}
-	return (1);
+	return (0);
 }
 
 int	main(int ac, char **av)
@@ -185,14 +202,14 @@ int	main(int ac, char **av)
 	if (!init_context(ac, av, &ctx))
 		return (1);
 	// Wait for a philosopher to die
-	sem_wait(ctx.sem_kill);
+	gettimeofday(&ctx.tv, NULL);
 	if (!fork_philosophers(&ctx))
 		return (close_semaphores(&ctx), 1);
-	wait_for_death(&ctx);
-	kill_all(ctx.pids, ctx.philo_count);
+	if (wait_for_death(&ctx))
+		kill_all(ctx.pids, ctx.philo_count);
 	// if (wait(NULL)) // Someone died
 	// 	kill_all(ctx.pids, ctx.philo_count);
-	wait_all(&ctx);
+	wait_all();
 	close_semaphores(&ctx);
 	return (0);
 }
