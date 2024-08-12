@@ -12,33 +12,12 @@
 
 #include "philo_bonus.h"
 
-static int	valid_config(t_context *ctx)
-{
-	return (ctx->philo_count > 0 && ctx->tt_die > 0
-			&& ctx->tt_eat >= 0 && ctx->tt_sleep >= 0);
-}
-
-sem_t	*open_semaphore(const char *name, int val)
-{
-	sem_t	*sem;
-
-	sem = sem_open(name, O_CREAT | O_EXCL, SEM_PERMS, val);
-	if (sem == SEM_FAILED)
-	{
-		sem_unlink(name);
-		sem = sem_open(name, O_CREAT | O_EXCL, SEM_PERMS, val);
-	}
-	if (sem != SEM_FAILED)
-		sem_unlink(name);
-	return (sem);
-}
-
 int	init_context(int ac, char **av, t_context *ctx)
 {
 	ctx->philo_count = ft_atoi(av[1]);
 	ctx->tt_die = ft_atoi(av[2]);
 	ctx->tt_eat = ft_atoi(av[3]);
-	ctx->tt_sleep =	ft_atoi(av[4]);
+	ctx->tt_sleep = ft_atoi(av[4]);
 	if (ac == 6)
 		ctx->max_meals = ft_atoi(av[5]);
 	else
@@ -60,66 +39,6 @@ int	init_context(int ac, char **av, t_context *ctx)
 	return (1);
 }
 
-void	close_semaphores(t_context *ctx)
-{
-	sem_close(ctx->sem_forks);
-	sem_close(ctx->sem_print);
-	sem_close(ctx->sem_state);
-	sem_close(ctx->sem_waiter);
-}
-
-void	*philosopher(void *p_philo)
-{
-	t_philo	*philo;
-
-	philo = p_philo;	
-	repeat_routine(philo, philo->ctx);
-	return (NULL);
-}
-
-int	monitor(t_context *ctx, t_philo *philo)
-{
-	t_state	state;
-
-	while (1)
-	{
-		sem_wait(ctx->sem_state);
-		get_philo_state(philo, &state);
-		if (ctx->max_meals > 0 && state.meal_count >= ctx->max_meals)
-			return (sem_post(ctx->sem_state), 0);
-		if (get_current_time() - state.last_meal > (size_t) ctx->tt_die)
-		{
-			sem_wait(ctx->sem_print);
-			printf("%zu philo N%d is dead.\n", get_timestamp(&ctx->tv), philo->id);
-			sem_post(ctx->sem_print);
-			philo->state = PHIL_DEAD;
-			sem_post(ctx->sem_state);
-			return (1);
-		}
-		sem_post(ctx->sem_state);
-		usleep(500);
-	}
-	return (0);
-}
-
-int	child_main(t_context *ctx, int id)
-{
-	t_philo	philo;
-	int		status;
-
-	philo.meal_count = 0;
-	philo.id = id;
-	philo.last_meal = get_current_time();
-	philo.ctx = ctx;
-	philo.state = PHIL_ALIVE;
-	pthread_create(&philo.thread, NULL, philosopher, &philo);
-	status = monitor(ctx, &philo);
-	pthread_join(philo.thread, NULL);
-	close_semaphores(ctx);
-	//printf("exit child\n");
-	return (status);
-}
-
 int	fork_philosophers(t_context *ctx)
 {
 	pid_t	pid;
@@ -129,7 +48,7 @@ int	fork_philosophers(t_context *ctx)
 	while (i < ctx->philo_count)
 	{
 		pid = fork();
-		if (pid < 0) // Kill ALL ??
+		if (pid < 0)
 			break ;
 		if (pid == 0)
 			exit(child_main(ctx, i + 1));
@@ -146,43 +65,33 @@ int	fork_philosophers(t_context *ctx)
 	return (1);
 }
 
-void	wait_all()
-{
-	while (waitpid(0, NULL, 0) >= 0)
-		continue ;
-}
-
 int	kill_all(pid_t *pids, int size)
 {
 	int	i;
 
 	i = 0;
+	printf("kill all\n");
 	while (i < size)
 	{
-		if (waitpid(pids[i], NULL, WNOHANG) >= 0) // Check if child process is still running
+		if (waitpid(pids[i], NULL, WNOHANG) >= 0)
 			kill(pids[i], SIGKILL);
 		i++;
 	}
 	return (0);
 }
-// Solution 1
-// Each child process monitors its philosopher, and posts sem_kill if it dies
-// Main process waits for sem_kill then kills all philosophers
-
-// Solution 2 (best)
-// Each child process monitors its philosopher, and kills itself when its philosopher dies
-// Main process waits for any child process to terminate, then kills all the other ones
 
 int	wait_for_death(t_context *ctx)
 {
 	int	status;
 	int	full_count;
+	int wpid;
 
 	full_count = 0;
 	while (full_count < ctx->philo_count)
 	{
-		if (waitpid(0, &status, WNOHANG) > 0)
-		{	
+		wpid = waitpid(0, &status, WNOHANG);
+		if ( wpid > 0)
+		{
 			if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
 				full_count++;
 			else
@@ -190,6 +99,7 @@ int	wait_for_death(t_context *ctx)
 		}
 		usleep(500);
 	}
+	printf("out last\n");
 	return (0);
 }
 
@@ -201,15 +111,31 @@ int	main(int ac, char **av)
 		return (1);
 	if (!init_context(ac, av, &ctx))
 		return (1);
-	// Wait for a philosopher to die
 	gettimeofday(&ctx.tv, NULL);
 	if (!fork_philosophers(&ctx))
 		return (close_semaphores(&ctx), 1);
 	if (wait_for_death(&ctx))
 		kill_all(ctx.pids, ctx.philo_count);
-	// if (wait(NULL)) // Someone died
-	// 	kill_all(ctx.pids, ctx.philo_count);
-	wait_all();
+	sem_wait(ctx.sem_print);
+	sem_post(ctx.sem_print);
+	while (waitpid(0, NULL, 0) >= 0)
+		continue ;
 	close_semaphores(&ctx);
 	return (0);
 }
+// MAIN PROCESS:
+// Forks the philosopher processes and waits for one to terminate to signal all child processes
+
+// CHILD PROCESS:
+// Creates a new thread for the philosopher routine and monitor its death
+// monitor should notify philosopher thread of its death as soon as possible
+// then child process should notify the main process or its siblings of its death asap
+
+// ON CHILD:
+// how to notify siblings of death without causing philosopher thread to hang ?
+// notifying using print or state semaphores causes philosopher thread to hang
+// can only use semaphores or exit
+// ON MAIN:
+// using a semaphore instead of waitpid NOHANG can work for death but may not work for meal limit
+// using waitpid NOHANG does not notify other child processes immediately
+// blocking print semaphore causes philosopher thread to hang

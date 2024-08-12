@@ -6,15 +6,15 @@
 #    By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/07 21:42:10 by bchanaa           #+#    #+#              #
-#    Updated: 2024/05/16 18:34:56 by bchanaa          ###   ########.fr        #
+#    Updated: 2024/07/21 11:49:56 by bchanaa          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -fsanitize=thread -g3
+CFLAGS = -Wall -Wextra -Werror #-fsanitize=thread -g3
 
 HEADERS = philo_bonus.h
-SOURCES = main.c utils.c time_utils.c routines.c
+SOURCES = main.c utils.c time_utils.c routines.c child.c
 OBJS := $(SOURCES:.c=.o)
 OBJECTS = $(addprefix $(OBJECTS_DIR)/, $(OBJS))
 OBJECTS_DIR = bin
@@ -29,6 +29,7 @@ address: $(OBJECTS)
 
 thread: $(OBJECTS)
 	$(CC) $(CFLAGS) -fsanitize=thread $(OBJECTS) -o $(NAME)
+
 
 $(NAME): $(OBJECTS)
 	cc $(CFLAGS) $(OBJECTS) -o $@

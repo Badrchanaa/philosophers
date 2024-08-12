@@ -14,13 +14,13 @@
 
 size_t	time_diff(struct timeval *tv1, struct timeval *tv2)
 {
-	return ((tv2->tv_sec * 1000 + tv2->tv_usec / 1000) - 
+	return ((tv2->tv_sec * 1000 + tv2->tv_usec / 1000) - \
 			(tv1->tv_sec * 1000 + tv1->tv_usec / 1000));
 }
 
 size_t	get_timestamp(struct timeval *start_tv)
 {
-	struct timeval tv;
+	struct timeval	tv;
 
 	gettimeofday(&tv, NULL);
 	return (time_diff(start_tv, &tv));

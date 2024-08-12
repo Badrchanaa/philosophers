@@ -19,14 +19,7 @@ int	is_dead(t_philo *philo, t_context *ctx)
 	sem_wait(ctx->sem_state);
 	state = philo->state;
 	sem_post(ctx->sem_state);
-	return (state == PHIL_DEAD || state == PHIL_FULL);
-}
-
-void	get_philo_state(t_philo *philo, t_state *state)
-{
-	state->meal_count = philo->meal_count;
-	state->state = philo->state;
-	state->last_meal = philo->last_meal;
+	return (state);
 }
 
 int	take_fork(t_philo *philo, t_context *ctx)
@@ -55,6 +48,8 @@ int	p_eat(t_philo *philo, t_context *ctx)
 		return (0);
 	sem_post(ctx->sem_waiter);
 	sem_wait(ctx->sem_print);
+	if (is_dead(philo, ctx))
+		return (0);
 	printf("%zu %d is eating.\n", get_timestamp(&ctx->tv), philo->id);
 	sem_post(ctx->sem_print);
 	precise_sleep(ctx->tt_eat);
@@ -89,7 +84,9 @@ void	repeat_routine(t_philo *philo, t_context *ctx)
 	if (is_dead(philo, ctx))
 		return ;
 	sem_wait(ctx->sem_print);
-	printf("%zu %d is thinking\n", get_timestamp(&ctx->tv), philo->id);
+	if (is_dead(philo, ctx))
+		return ;
+	printf("%zu %d is thinking.\n", get_timestamp(&ctx->tv), philo->id);
 	sem_post(ctx->sem_print);
 	if (!p_eat(philo, ctx))
 		return ;
