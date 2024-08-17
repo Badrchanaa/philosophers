@@ -143,6 +143,23 @@ int	main(int ac, char **av)
 	close_semaphores(&ctx);
 	return (0);
 }
+
+int	main(int ac, char **av)
+{
+	t_context	ctx;
+	if (ac < 5 || ac > 6)
+		return (1);
+	if (!init_context(ac, av, &ctx))
+		return (1);
+	gettimeofday(&ctx.tv, NULL);
+	if (!fork_philosophers(&ctx))
+		return (close_semaphores(&ctx), 1);
+	monitor_all();
+		
+	return (0);
+
+}
+
 // MAIN PROCESS:
 // Forks the philosopher processes and waits for one to terminate to signal all child processes
 
@@ -159,3 +176,5 @@ int	main(int ac, char **av)
 // using a semaphore instead of waitpid NOHANG can work for death but may not work for meal limit
 // using waitpid NOHANG does not notify other child processes immediately
 // blocking print semaphore causes philosopher thread to hang
+
+// Main process scheduling of philosophers to eat
