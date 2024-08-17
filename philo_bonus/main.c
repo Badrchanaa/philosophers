@@ -144,6 +144,37 @@ int	main(int ac, char **av)
 	return (0);
 }
 
+void	monitor_philosopher(void *p_philo)
+{
+	t_philo		*philo;
+	t_context	*ctx;
+
+	philo = (t_philo *)p_philo;
+	ctx = philo->ctx;
+	while (philo->meal_count < ctx->max_meals)
+	{
+		sem_wait(philo->sem_eat);
+		philo->meal_count++;
+		
+	}
+}
+
+void	monitor_all(t_context *ctx)
+{
+	t_philo	*philo;
+	int	i;
+
+	i = 0;
+	while (i < ctx->philo_count)
+	{
+		philo = ctx->philos[i];
+		if (pthread_create(&philo.thread, NULL, monitor_philosopher, &philo))
+			return (1);
+		pthread_detach(philo.thread);
+		i++;
+	}
+}
+
 int	main(int ac, char **av)
 {
 	t_context	ctx;
@@ -155,7 +186,6 @@ int	main(int ac, char **av)
 	if (!fork_philosophers(&ctx))
 		return (close_semaphores(&ctx), 1);
 	monitor_all();
-		
 	return (0);
 
 }

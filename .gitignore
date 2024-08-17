@@ -1,2 +1,5 @@
 .*.swp
+*/philo
+*/philo_bonus
+*/a.out
 bin/

@@ -93,3 +93,4 @@ int	child_main(t_context *ctx, int id)
 // 2nd thread should monitor other philosophers death
 // 3rd thread is the philosopher
 // when 2nd thread receives death of another philosopher 
+j
