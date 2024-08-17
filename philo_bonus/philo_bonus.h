@@ -42,6 +42,7 @@ typedef struct s_context
 	sem_t			*sem_print;
 	sem_t			*sem_waiter;
 	sem_t			*sem_state;
+	sem_t			*sem_kill;
 	pid_t			pids[200];
 	int				philo_count;
 	int				tt_sleep;
@@ -67,6 +68,7 @@ typedef struct s_state
 	int		state;
 }		t_state;
 
+int	kill_others(t_context *ctx, int id);
 int		ft_atoi(const char *str);
 int		valid_config(t_context *ctx);
 

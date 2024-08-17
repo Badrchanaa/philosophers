@@ -25,6 +25,7 @@ void	*philosopher(void *p_philo)
 
 	philo = p_philo;
 	repeat_routine(philo, philo->ctx);
+	printf("philo out\n");
 	return (NULL);
 }
 
@@ -44,12 +45,16 @@ void	*monitor(void *p_philo)
 			return (sem_post(ctx->sem_state), NULL);
 		if (get_current_time() - state.last_meal > (size_t) ctx->tt_die)
 		{
+			sem_post(ctx->sem_state);
+			sem_wait(ctx->sem_kill);
 			sem_wait(ctx->sem_print);
 			printf("%zu %d died.\n", get_timestamp(&ctx->tv), philo->id);
-			sem_post(ctx->sem_print);
-			sem_post(ctx->sem_forks);
+			sem_wait(ctx->sem_state);
 			philo->state = PHIL_DEAD;
 			sem_post(ctx->sem_state);
+			sem_post(ctx->sem_print);
+			sem_post(ctx->sem_waiter);
+			sem_post(ctx->sem_forks);
 			//close_semaphores(ctx);
 			//exit(1);
 			return (NULL);
@@ -81,3 +86,10 @@ int	child_main(t_context *ctx, int id)
 	//status = monitor(ctx, &philo);
 	return (philo.state == PHIL_DEAD);
 }
+
+
+// each philo process should have 3 threads (main thread + 2 other threads;
+// main thread should monitor philosopher death by time
+// 2nd thread should monitor other philosophers death
+// 3rd thread is the philosopher
+// when 2nd thread receives death of another philosopher 

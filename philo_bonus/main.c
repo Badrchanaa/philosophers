@@ -36,6 +36,9 @@ int	init_context(int ac, char **av, t_context *ctx)
 	ctx->sem_state = open_semaphore(SEM_STATE, 1);
 	if (ctx->sem_state == SEM_FAILED)
 		return (0);
+	ctx->sem_kill = open_semaphore(SEM_KILL, 1);
+	if (ctx->sem_kill == SEM_FAILED)
+		return (0);
 	return (1);
 }
 
@@ -53,7 +56,10 @@ int	fork_philosophers(t_context *ctx)
 		if (pid == 0)
 			exit(child_main(ctx, i + 1));
 		else
+		{
 			ctx->pids[i] = pid;
+			printf("forked philo N%d with pid %d\n", i + 1, pid);
+		}
 		i++;
 	}
 	if (i < ctx->philo_count)
@@ -65,6 +71,22 @@ int	fork_philosophers(t_context *ctx)
 	return (1);
 }
 
+int	kill_others(t_context *ctx, int id)
+{
+	int	i;
+
+	i = 0;
+	while (i < ctx->philo_count)
+	{
+		if (i != id - 1)
+		printf("%d killed %d (pid %d)\n", id, i+1, ctx->pids[i]);
+			kill(ctx->pids[i], SIGINT);
+		i++;
+	}
+	//kill(ctx->pids[id - 1], SIGKILL);
+	return (0);
+}
+
 int	kill_all(pid_t *pids, int size)
 {
 	int	i;
@@ -73,8 +95,7 @@ int	kill_all(pid_t *pids, int size)
 	printf("kill all\n");
 	while (i < size)
 	{
-		if (waitpid(pids[i], NULL, WNOHANG) >= 0)
-			kill(pids[i], SIGKILL);
+		kill(pids[i], SIGKILL);
 		i++;
 	}
 	return (0);
@@ -99,7 +120,6 @@ int	wait_for_death(t_context *ctx)
 		}
 		usleep(500);
 	}
-	printf("out last\n");
 	return (0);
 }
 

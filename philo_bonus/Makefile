@@ -11,7 +11,7 @@
 # **************************************************************************** #
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror #-fsanitize=thread -g3
+CFLAGS = -Wall -Wextra -Werror -g3 #-fsanitize=leak -g3
 
 HEADERS = philo_bonus.h
 SOURCES = main.c utils.c time_utils.c routines.c child.c
