@@ -29,20 +29,35 @@
 # define SEM_STATE "/philo_state"
 # define SEM_WAITER "/philo_waiter"
 # define SEM_KILL "/philo_kill"
+# define SEM_MEAL "/philo_meal"
+# define SEM_MAIN_STATE "/philo_main_state"
 # define SEM_PERMS 0600
 
 # define PHIL_ALIVE 0
 # define PHIL_DEAD 1
 # define PHIL_FULL 2
 
+typedef enum e_state
+{
+	ALIVE,
+	FULL,
+	DEAD,
+	UNKNOWN
+}		t_state;
+
 typedef struct s_context
 {
+	pthread_t		meal_thread;
+	pthread_t		death_thread;
+	int				state;
 	struct timeval	tv;
 	sem_t			*sem_forks;
 	sem_t			*sem_print;
 	sem_t			*sem_waiter;
 	sem_t			*sem_state;
+	sem_t			*sem_main_state;
 	sem_t			*sem_kill;
+	sem_t			*sem_meal;
 	pid_t			pids[200];
 	int				philo_count;
 	int				tt_sleep;
@@ -61,14 +76,23 @@ typedef struct s_philo
 	size_t		last_meal;
 }				t_philo;
 
-typedef struct s_state
+typedef struct s_philo_state
 {
 	size_t	last_meal;
 	int		meal_count;
 	int		state;
-}		t_state;
+}		t_philo_state;
 
-int	kill_others(t_context *ctx, int id);
+int		init_context(int ac, char **av, t_context *ctx);
+int		init_semaphores(t_context *ctx);
+
+void	set_state(t_context *ctx, t_state state);
+t_state	get_state(t_context *ctx);
+
+void	*monitor_meals(void *p_context);
+void	*monitor_death(void *p_context);
+
+int		kill_all(pid_t *pids, int size);
 int		ft_atoi(const char *str);
 int		valid_config(t_context *ctx);
 
@@ -81,7 +105,7 @@ sem_t	*open_semaphore(const char *name, int val);
 void	close_semaphores(t_context *ctx);
 
 int		is_dead(t_philo *philo, t_context *ctx);
-void	get_philo_state(t_philo *philo, t_state *state);
+void	get_philo_state(t_philo *philo, t_philo_state *state);
 int		child_main(t_context *ctx, int id);
 
 int		take_fork(t_philo *philo, t_context *ctx);

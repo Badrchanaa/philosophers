@@ -18,6 +18,9 @@ void	close_semaphores(t_context *ctx)
 	sem_close(ctx->sem_print);
 	sem_close(ctx->sem_state);
 	sem_close(ctx->sem_waiter);
+	sem_close(ctx->sem_meal);
+	sem_close(ctx->sem_kill);
+	sem_close(ctx->sem_main_state);
 }
 
 sem_t	*open_semaphore(const char *name, int val)
@@ -30,8 +33,6 @@ sem_t	*open_semaphore(const char *name, int val)
 		sem_unlink(name);
 		sem = sem_open(name, O_CREAT | O_EXCL, SEM_PERMS, val);
 	}
-	if (sem != SEM_FAILED)
-		sem_unlink(name);
 	return (sem);
 }
 
