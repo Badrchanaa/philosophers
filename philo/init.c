@@ -12,18 +12,12 @@
 
 #include "philo.h"
 
-static int	valid_config(t_context *ctx)
-{
-	return (ctx->philo_count > 0 && ctx->tt_die > 0
-			&& ctx->tt_eat >= 0 && ctx->tt_sleep >= 0);
-}
-
 int	init_context(int ac, char **av, t_context *ctx)
 {
 	ctx->philo_count = ft_atoi(av[1]);
 	ctx->tt_die = ft_atoi(av[2]);
 	ctx->tt_eat = ft_atoi(av[3]);
-	ctx->tt_sleep =	ft_atoi(av[4]);
+	ctx->tt_sleep = ft_atoi(av[4]);
 	ctx->kill_all = 0;
 	if (ac == 6)
 		ctx->max_meals = ft_atoi(av[5]);
@@ -35,6 +29,8 @@ int	init_context(int ac, char **av, t_context *ctx)
 	if (!ctx->forks)
 		return (0);
 	if (pthread_mutex_init(&ctx->kill_lock, NULL))
+		return (free(ctx->forks), 0);
+	if (pthread_mutex_init(&ctx->print_lock, NULL))
 		return (free(ctx->forks), 0);
 	return (1);
 }
@@ -72,7 +68,7 @@ int	init_philos(t_context *ctx, t_philo *philos)
 	while (i < ctx->philo_count)
 	{
 		if (new_philo(ctx, philos, i))
-			break;
+			break ;
 		i++;
 	}
 	return (i < ctx->philo_count);
@@ -88,7 +84,7 @@ int	init_forks(pthread_mutex_t *forks, int size)
 	while (i < size)
 	{
 		if (pthread_mutex_init(forks + i, NULL))
-			break;
+			break ;
 		i++;
 	}
 	if (i < size)
@@ -97,30 +93,4 @@ int	init_forks(pthread_mutex_t *forks, int size)
 		return (0);
 	}
 	return (1);
-}
-
-void	destroy_forks(pthread_mutex_t *forks, int size)
-{
-	int	i;
-
-	i = 0;
-	while (i < size)
-	{
-		pthread_mutex_destroy(forks + i);
-		i++;
-	}
-}
-
-void	destroy_philosophers(t_philo *philos, int size)
-{
-	t_philo	*philo;
-	int		i;
-
-	i = 0;
-	while (i < size)
-	{
-		philo = philos + i;
-		destroy_philo(philo);
-		i++;
-	}
 }
