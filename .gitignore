@@ -1,3 +1,7 @@
 .*.swp
+*/philo
+*/philo_bonus
+*/a.out
+*/.nfs*
 bin/
 */.nfs*

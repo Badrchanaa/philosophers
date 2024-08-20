@@ -11,37 +11,6 @@
 /* ************************************************************************** */
 #include "philo.h"
 
-static int	ft_isspace(char c)
-{
-	return (c == 32 || (c >= 9 && c <= 13));
-}
-
-int	ft_atoi(const char *str)
-{
-	int	i;
-	int	res;
-	int	sign;
-
-	sign = 1;
-	i = 0;
-	res = 0;
-	while (str[i] && ft_isspace(str[i]))
-		i++;
-	if (str[i] == '-')
-	{
-		sign = -1;
-		i++;
-	}
-	else if (str[i] == '+')
-		i++;
-	while (str[i] && str[i] >= '0' && str[i] <= '9')
-	{
-		res = (res * 10) + str[i] - '0';
-		i++;
-	}
-	return (res * sign);
-}
-
 int	right_philo(int philo_id, int philo_count)
 {
 	if (philo_id == philo_count - 1)
@@ -63,12 +32,33 @@ inline int	philo_starved(t_philo *philo)
 	return (diff > INT_MAX || (int)diff >= philo->ctx->tt_die);
 }
 
+void	print_state(t_philo *philo, t_state state, int id)
+{
+	t_context	*ctx;
+	size_t		ts;
+
+	ctx = philo->ctx;
+	pthread_mutex_lock(&ctx->print_lock);
+	ts = get_timestamp(&ctx->tv);
+	if (state == HELD_FORK)
+		printf("%zu %d has taken a fork\n", ts, id);
+	else if (state == EATING)
+		printf("%zu %d is eating.\n", ts, id);
+	else if (state == SLEEPING)
+		printf("%zu %d is sleeping.\n", ts, id);
+	else if (state == THINKING)
+		printf("%zu philo N%d is thinking.\n", ts, id);
+	else if (state == DEAD)
+		printf("%zu %d died.\n", ts, id);
+	pthread_mutex_unlock(&ctx->print_lock);
+}
+
 int	is_dead(t_philo *philo)
 {
 	int	count;
 
 	pthread_mutex_lock(&philo->count_lock);
-	count = philo->meal_count;	
+	count = philo->meal_count;
 	pthread_mutex_unlock(&philo->count_lock);
 	return (count < 0);
 }

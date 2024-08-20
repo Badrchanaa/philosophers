@@ -1,45 +1,51 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   libft_funcs.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/18 22:13:09 by bchanaa           #+#    #+#             */
-/*   Updated: 2024/05/18 22:13:10 by bchanaa          ###   ########.fr       */
+/*   Created: 2024/08/20 14:25:59 by bchanaa           #+#    #+#             */
+/*   Updated: 2024/08/20 14:26:02 by bchanaa          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo_bonus.h"
+#include "philo.h"
 
-void	close_semaphores(t_context *ctx)
+int	ft_isdigit(int c)
 {
-	sem_close(ctx->sem_forks);
-	sem_close(ctx->sem_print);
-	sem_close(ctx->sem_state);
-	sem_close(ctx->sem_waiter);
-	sem_close(ctx->sem_meal);
-	sem_close(ctx->sem_kill);
-	sem_close(ctx->sem_main_state);
+	return (c >= '0' && c <= '9');
 }
 
-sem_t	*open_semaphore(const char *name, int val)
+size_t	ft_strlen(const char *s)
 {
-	sem_t	*sem;
+	size_t	i;
 
-	sem = sem_open(name, O_CREAT | O_EXCL, SEM_PERMS, val);
-	if (sem == SEM_FAILED)
+	i = 0;
+	while (s[i])
+		i++;
+	return (i);
+}
+
+int	ft_strncmp(const char *s1, const char *s2, size_t n)
+{
+	size_t			i;
+
+	i = 0;
+	if (n == 0)
+		return (0);
+	if (s1[i] == '\0' && s2[i] == '\0')
+		return (0);
+	while (i < n)
 	{
-		sem_unlink(name);
-		sem = sem_open(name, O_CREAT | O_EXCL, SEM_PERMS, val);
+		if (s1[i] == '\0' || s2[i] == '\0')
+			return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+		if (s1[i] != s2[i])
+			return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+		i++;
 	}
-	return (sem);
-}
-
-int	valid_config(t_context *ctx)
-{
-	return (ctx->philo_count > 0 && ctx->tt_die > 0 \
-			&& ctx->tt_eat > 0 && ctx->tt_sleep > 0);
+	i--;
+	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
 
 static int	ft_isspace(char c)

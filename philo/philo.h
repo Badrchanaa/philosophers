@@ -21,10 +21,20 @@
 # include <string.h>
 # include <limits.h>
 
-typedef struct	s_context
+typedef enum e_state
+{
+	HELD_FORK,
+	EATING,
+	SLEEPING,
+	THINKING,
+	DEAD
+}	t_state;
+
+typedef struct s_context
 {
 	struct timeval	tv;
 	pthread_mutex_t	kill_lock;
+	pthread_mutex_t	print_lock;
 	pthread_mutex_t	*forks;
 	int				philo_count;
 	int				tt_sleep;
@@ -34,7 +44,7 @@ typedef struct	s_context
 	int				kill_all;
 }				t_context;
 
-typedef struct	s_philo
+typedef struct s_philo
 {
 	t_context		*ctx;
 	pthread_t		thread;
@@ -46,6 +56,19 @@ typedef struct	s_philo
 	int				meal_count;
 }			t_philo;
 
+int		still_alive(t_philo *philo);
+void	destroy_philo(t_philo *philo);
+int		is_full(t_philo *philo);
+int		philo_eat(t_philo *philo);
+int		philo_sleep(t_philo *philo);
+void	release_forks(t_philo *philo);
+int		ft_atoi(const char *str);
+int		ft_strncmp(const char *s1, const char *s2, size_t n);
+size_t	ft_strlen(const char *s);
+int		ft_isdigit(int c);
+void	print_state(t_philo *philo, t_state state, int id);
+int		valid_arguments(int ac, char **av);
+int		valid_config(t_context *ctx);
 void	*philosopher(void *p_philo);
 int		ft_atoi(const char *str);
 int		left_philo(int philo_id, int philo_count);
@@ -62,6 +85,6 @@ size_t	get_timestamp(struct timeval *start_tv);
 size_t	get_current_time(void);
 
 void	apocalypse(t_context *ctx, t_philo *philo);
-int	is_dead(t_philo *philo);
+int		is_dead(t_philo *philo);
 
 #endif
