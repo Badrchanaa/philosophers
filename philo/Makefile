@@ -6,12 +6,12 @@
 #    By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/07 21:42:10 by bchanaa           #+#    #+#              #
-#    Updated: 2024/10/02 09:39:31 by bchanaa          ###   ########.fr        #
+#    Updated: 2024/10/02 15:09:41 by bchanaa          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror #-fsanitize=thread -g3
+CFLAGS = -Wall -Wextra -Werror #-fsanitize=address -g3
 
 HEADERS = philo.h
 SOURCES = main.c init.c utils.c time_utils.c philosopher.c routines.c utils2.c libft_funcs.c cleanup.c
