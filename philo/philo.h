@@ -70,6 +70,7 @@ void	print_state(t_philo *philo, t_state state, int id);
 int		valid_arguments(int ac, char **av);
 int		valid_config(t_context *ctx);
 void	*philosopher(void *p_philo);
+void	routine_loop(t_context *ctx, t_philo *philo);
 int		ft_atoi(const char *str);
 int		left_philo(int philo_id, int philo_count);
 int		right_philo(int philo_id, int philo_count);

@@ -6,15 +6,15 @@
 #    By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/07 21:42:10 by bchanaa           #+#    #+#              #
-#    Updated: 2024/05/16 18:34:56 by bchanaa          ###   ########.fr        #
+#    Updated: 2024/10/02 09:39:31 by bchanaa          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -fsanitize=thread -g3
+CFLAGS = -Wall -Wextra -Werror #-fsanitize=thread -g3
 
 HEADERS = philo.h
-SOURCES = main.c init.c utils.c time_utils.c routines.c utils2.c libft_funcs.c cleanup.c
+SOURCES = main.c init.c utils.c time_utils.c philosopher.c routines.c utils2.c libft_funcs.c cleanup.c
 OBJS := $(SOURCES:.c=.o)
 OBJECTS = $(addprefix $(OBJECTS_DIR)/, $(OBJS))
 OBJECTS_DIR = bin
@@ -24,14 +24,8 @@ NAME = philo
 
 all: $(NAME)
 
-address: $(OBJECTS)
-	$(CC) $(CFLAGS) -fsanitize=address $(OBJECTS) -o $(NAME)
-
-thread: $(OBJECTS)
-	$(CC) $(CFLAGS) -fsanitize=thread $(OBJECTS) -o $(NAME)
-
 $(NAME): $(OBJECTS)
-	cc $(CFLAGS) $(OBJECTS) -o $@
+	cc -pthread $(CFLAGS) $(OBJECTS) -o $@
 
 $(OBJECTS_DIR)/%.o: %.c $(HEADERS) | $(OBJECTS_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@

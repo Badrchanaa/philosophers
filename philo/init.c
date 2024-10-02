@@ -6,7 +6,7 @@
 /*   By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 21:19:49 by bchanaa           #+#    #+#             */
-/*   Updated: 2024/05/16 16:34:51 by bchanaa          ###   ########.fr       */
+/*   Updated: 2024/10/02 14:11:45 by bchanaa          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,8 @@ int	init_philos(t_context *ctx, t_philo *philos)
 			break ;
 		i++;
 	}
+	if (i < ctx->philo_count)
+		ctx->kill_all = 1;
 	return (i < ctx->philo_count);
 }
 

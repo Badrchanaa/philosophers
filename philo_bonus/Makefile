@@ -24,15 +24,8 @@ NAME = philo_bonus
 
 all: $(NAME)
 
-address: $(OBJECTS)
-	$(CC) $(CFLAGS) -fsanitize=address $(OBJECTS) -o $(NAME)
-
-thread: $(OBJECTS)
-	$(CC) $(CFLAGS) -fsanitize=thread $(OBJECTS) -o $(NAME)
-
-
 $(NAME): $(OBJECTS)
-	cc $(CFLAGS) $(OBJECTS) -o $@
+	cc -pthread $(CFLAGS) $(OBJECTS) -o $@
 
 $(OBJECTS_DIR)/%.o: %.c $(HEADERS) | $(OBJECTS_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
