@@ -6,7 +6,7 @@
 #    By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/07 21:42:10 by bchanaa           #+#    #+#              #
-#    Updated: 2024/10/02 15:09:41 by bchanaa          ###   ########.fr        #
+#    Updated: 2024/10/05 18:24:58 by bchanaa          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,7 @@ NAME = philo
 all: $(NAME)
 
 $(NAME): $(OBJECTS)
-	cc -pthread $(CFLAGS) $(OBJECTS) -o $@
+	$(CC) -pthread $(CFLAGS) $(OBJECTS) -o $@
 
 $(OBJECTS_DIR)/%.o: %.c $(HEADERS) | $(OBJECTS_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
