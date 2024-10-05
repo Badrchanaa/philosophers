@@ -25,6 +25,7 @@ int	init_context(int ac, char **av, t_context *ctx)
 		ctx->max_meals = -1;
 	if (!valid_config(ctx))
 		return (0);
+	ctx->first_delay = 500 * (1 + ctx->philo_count / 100);
 	ctx->forks = malloc(sizeof(pthread_mutex_t) * (ctx->philo_count));
 	if (!ctx->forks)
 		return (0);

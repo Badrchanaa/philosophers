@@ -41,13 +41,13 @@ void	print_state(t_philo *philo, t_state state, int id)
 	pthread_mutex_lock(&ctx->print_lock);
 	ts = get_timestamp(&ctx->tv);
 	if (state == HELD_FORK)
-		printf("%zu %d has taken a fork\n", ts, id);
+		printf("%zu %d has taken a fork.\n", ts, id);
 	else if (state == EATING)
 		printf("%zu %d is eating.\n", ts, id);
 	else if (state == SLEEPING)
 		printf("%zu %d is sleeping.\n", ts, id);
 	else if (state == THINKING)
-		printf("%zu philo N%d is thinking.\n", ts, id);
+		printf("%zu philo %d is thinking.\n", ts, id);
 	else if (state == DEAD)
 		printf("%zu %d died.\n", ts, id);
 	pthread_mutex_unlock(&ctx->print_lock);

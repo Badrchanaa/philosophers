@@ -36,6 +36,7 @@ typedef struct s_context
 	pthread_mutex_t	kill_lock;
 	pthread_mutex_t	print_lock;
 	pthread_mutex_t	*forks;
+	int				first_delay;
 	int				philo_count;
 	int				tt_sleep;
 	int				tt_eat;

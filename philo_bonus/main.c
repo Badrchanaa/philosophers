@@ -87,9 +87,9 @@ int	main(int ac, char **av)
 	if (!fork_philosophers(&ctx))
 		return (close_semaphores(&ctx), 1);
 	if (pthread_create(&ctx.meal_thread, NULL, monitor_meals, &ctx))
-		return (printf("philo_bonus: create_thread failed\n"), 1);
+		return (printf("philo_bonus: pthread_create failed\n"), 1);
 	if (pthread_create(&ctx.death_thread, NULL, monitor_death, &ctx))
-		return (printf("philo_bonus: create_thread failed\n"), 1);
+		return (printf("philo_bonus: pthread_create failed\n"), 1);
 	set_state(&ctx, ALIVE);
 	while (get_state(&ctx) == ALIVE)
 		usleep(1000);

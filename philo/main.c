@@ -20,7 +20,7 @@ t_philo	*start_simulation(t_context *ctx)
 
 	philos = malloc(sizeof(t_philo) * (ctx->philo_count));
 	if (!philos)
-		return (printf("malloc err\n"), NULL);
+		return (NULL);
 	i = 0;
 	gettimeofday(&ctx->tv, NULL);
 	err = init_philos(ctx, philos);
@@ -72,6 +72,18 @@ void	monitor(t_context *ctx, t_philo *philos)
 	}
 }
 
+void	set_meal_time(t_context *ctx, t_philo *philos)
+{
+	int	i;
+
+	i = 0;
+	while (i < ctx->philo_count)
+	{
+		philos[i].last_meal = get_current_time();
+		i++;
+	}
+}
+
 int	main(int ac, char *av[])
 {
 	t_context	ctx;
@@ -85,11 +97,11 @@ int	main(int ac, char *av[])
 	philos = start_simulation(&ctx);
 	if (!philos)
 		return (printf("philo: could not spawn philosohpers\n"), 1);
+	set_meal_time(&ctx, philos);
 	pthread_mutex_unlock(&ctx.kill_lock);
 	if (ctx.max_meals != 0)
 		monitor(&ctx, philos);
 	join_all(philos, ctx.philo_count);
-	printf("Out of main\n");
 	destroy_forks(ctx.forks, ctx.philo_count);
 	destroy_philosophers(philos, ctx.philo_count);
 	free(philos);

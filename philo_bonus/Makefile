@@ -6,12 +6,12 @@
 #    By: bchanaa <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/07 21:42:10 by bchanaa           #+#    #+#              #
-#    Updated: 2024/07/21 11:49:56 by bchanaa          ###   ########.fr        #
+#    Updated: 2024/10/05 14:52:32 by bchanaa          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -g3	#-fsanitize=leak
+CFLAGS = -Wall -Wextra -Werror -g3 #-fsanitize=address
 
 HEADERS = philo_bonus.h
 SOURCES = main.c utils.c time_utils.c routines.c child.c init.c threads.c

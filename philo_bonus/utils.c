@@ -38,6 +38,8 @@ sem_t	*open_semaphore(const char *name, int val)
 
 int	valid_config(t_context *ctx)
 {
+	if (ctx->philo_count > 200)
+		return (0);
 	return (ctx->philo_count > 0 && ctx->tt_die > 0 \
 			&& ctx->tt_eat > 0 && ctx->tt_sleep > 0);
 }
