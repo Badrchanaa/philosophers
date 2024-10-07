@@ -78,9 +78,9 @@ int	main(int ac, char **av)
 	t_context	ctx;
 
 	if (ac < 5 || ac > 6)
-		return (1);
-	if (!init_context(ac, av, &ctx))
-		return (printf("philo_bonus: invalid arguments.\n"), 1);
+		return (print_usage(), 1);
+	if (!valid_arguments(ac, av) || !init_context(ac, av, &ctx))
+		return (print_usage(), 1);
 	if (!init_semaphores(&ctx))
 		return (printf("philo_bonus: failed to open semaphores\n"), 1);
 	gettimeofday(&ctx.tv, NULL);

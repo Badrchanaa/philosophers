@@ -83,6 +83,8 @@ typedef struct s_philo_state
 	int		state;
 }		t_philo_state;
 
+void	print_usage(void);
+int		valid_arguments(int ac, char **av);
 int		init_context(int ac, char **av, t_context *ctx);
 int		init_semaphores(t_context *ctx);
 
@@ -93,6 +95,9 @@ void	*monitor_meals(void *p_context);
 void	*monitor_death(void *p_context);
 
 int		kill_all(pid_t *pids, int size);
+int		ft_strncmp(const char *s1, const char *s2, size_t n);
+size_t	ft_strlen(const char *s);
+int		ft_isdigit(int c);
 int		ft_atoi(const char *str);
 int		valid_config(t_context *ctx);
 

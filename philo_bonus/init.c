@@ -12,6 +12,12 @@
 
 #include "philo_bonus.h"
 
+void	print_usage(void)
+{
+	printf("Usage: ./philo_bonus PHILOS TTD TTE TTS [MAX_MEALS]\n");
+	printf("All arguments are in milliseconds and must be valid integers.\n");
+}
+
 int	init_context(int ac, char **av, t_context *ctx)
 {
 	ctx->state = UNKNOWN;

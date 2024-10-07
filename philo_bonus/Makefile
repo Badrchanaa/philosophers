@@ -14,7 +14,7 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror -g3 #-fsanitize=address
 
 HEADERS = philo_bonus.h
-SOURCES = main.c utils.c time_utils.c routines.c child.c init.c threads.c
+SOURCES = main.c utils.c time_utils.c routines.c child.c init.c threads.c utils2.c libft_funcs.c
 OBJS := $(SOURCES:.c=.o)
 OBJECTS = $(addprefix $(OBJECTS_DIR)/, $(OBJS))
 OBJECTS_DIR = bin
